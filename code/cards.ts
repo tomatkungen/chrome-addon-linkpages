@@ -130,13 +130,13 @@ const conf = [
     id: 1,
     title: "Conflunce",
     subTitle: "Latest Wiki updates - Linköping",
-    link: "https://axis-lkp.atlassian.net/wiki"
+    link: "www.google.se"
   },
   {
     id: 2,
     title: "Conflunce",
     subTitle: "Latest Wiki updates - Linköping",
-    link: "https://axis-lkp.atlassian.net/wiki"
+    link: "www.google.se"
   }
 ];
 
