@@ -1,5 +1,6 @@
 import { iConfigurePageLink } from "./structure";
 import { Utils } from "./utils";
+import { cDataStorage } from "./datastorage";
 
 class cCard {
   private cardId: string;
@@ -7,6 +8,13 @@ class cCard {
   constructor(private configurePageLink: iConfigurePageLink) {
     this.addDefaultGroup();
     this.cardId = "ons-card";
+
+    if (cDataStorage.hasLocalStorage()) {
+      cDataStorage.addJsonToStorage(
+        configurePageLink.id.toString(),
+        configurePageLink
+      );
+    }
   }
 
   private addDefaultGroup() {

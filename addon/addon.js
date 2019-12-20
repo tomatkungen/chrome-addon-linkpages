@@ -31,7 +31,39 @@ define("utils", ["require", "exports"], function (require, exports) {
     }
     exports.Utils = Utils;
 });
-define("card", ["require", "exports", "utils"], function (require, exports, utils_1) {
+define("datastorage", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class cDataStorage {
+        constructor() { }
+        static hasLocalStorage() {
+            return window.localStorage ? true : false;
+        }
+        static addJsonToStorage(key, obj) {
+            if (!cDataStorage.hasLocalStorage() || !obj)
+                return;
+            window.localStorage.setItem(key, JSON.stringify(obj));
+            cDataStorage.addKey(key);
+        }
+        static getJsonFromStorage(key) {
+            if (!cDataStorage.hasLocalStorage() || key === "")
+                return {};
+            return JSON.parse(window.localStorage.getItem(key) || "");
+        }
+        static addKey(key) {
+            if (!cDataStorage.hasLocalStorage())
+                return;
+            let aryKeys = JSON.parse(window.localStorage.getItem("key") || "[]");
+            // If key already exists then return
+            if (aryKeys.includes(key))
+                return;
+            (!aryKeys && (aryKeys = []) && aryKeys.push(key)) || aryKeys.push(key);
+            window.localStorage.setItem("key", JSON.stringify(aryKeys));
+        }
+    }
+    exports.cDataStorage = cDataStorage;
+});
+define("card", ["require", "exports", "utils", "datastorage"], function (require, exports, utils_1, datastorage_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class cCard {
@@ -39,6 +71,9 @@ define("card", ["require", "exports", "utils"], function (require, exports, util
             this.configurePageLink = configurePageLink;
             this.addDefaultGroup();
             this.cardId = "ons-card";
+            if (datastorage_1.cDataStorage.hasLocalStorage()) {
+                datastorage_1.cDataStorage.addJsonToStorage(configurePageLink.id.toString(), configurePageLink);
+            }
         }
         addDefaultGroup() {
             utils_1.Utils.isObject(this.configurePageLink) &&
