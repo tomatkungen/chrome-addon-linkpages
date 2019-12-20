@@ -19,6 +19,7 @@ develop:
 	$(TSC) -w
 
 server:
+	@echo "Start server. Port 4000"
 	php -S localhost:4000 -t ./addon/
 
 clean:

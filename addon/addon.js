@@ -18,8 +18,8 @@ define("utils", ["require", "exports"], function (require, exports) {
                 return;
             Object.keys(obj).forEach((key, index) => {
                 if (callback && key && obj[key]) {
+                    callback(obj[key], key, index, obj);
                 }
-                callback(obj[key], key, index, obj);
             });
         }
         static getElmsByTagName(id) {
@@ -165,13 +165,13 @@ define("cards", ["require", "exports", "card", "utils"], function (require, expo
             id: 1,
             title: "Conflunce",
             subTitle: "Latest Wiki updates - Linköping",
-            link: "https://axis-lkp.atlassian.net/wiki"
+            link: "http://www.google.se"
         },
         {
             id: 2,
             title: "Conflunce",
             subTitle: "Latest Wiki updates - Linköping",
-            link: "https://axis-lkp.atlassian.net/wiki"
+            link: "http://www.google.se"
         }
     ];
     new cCards(conf).render();

@@ -3,12 +3,16 @@ import { iConfigurePageLink, iSettingCards } from "./structure";
 import { Utils } from "./utils";
 
 class cCards {
+  // Element container
   private elmContainer: HTMLElement | null;
 
+  // Element continar id
   private elmContainerId: string;
 
+  // Array of cards
   private cCards: cCard[];
 
+  // Settings for card style
   private settings: iSettingCards;
 
   constructor(
@@ -130,13 +134,13 @@ const conf = [
     id: 1,
     title: "Conflunce",
     subTitle: "Latest Wiki updates - Linköping",
-    link: "www.google.se"
+    link: "http://www.google.se"
   },
   {
     id: 2,
     title: "Conflunce",
     subTitle: "Latest Wiki updates - Linköping",
-    link: "www.google.se"
+    link: "http://www.google.se"
   }
 ];
 

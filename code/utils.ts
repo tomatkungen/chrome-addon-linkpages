@@ -17,8 +17,8 @@ class Utils {
 
     Object.keys(obj).forEach((key: string, index: number) => {
       if (callback && key && obj[key]) {
+        callback(obj[key], key, index, obj);
       }
-      callback(obj[key], key, index, obj);
     });
   }
 
