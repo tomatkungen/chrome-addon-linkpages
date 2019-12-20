@@ -13,6 +13,7 @@ production:
 	cp lib/*.js ./addon/lib
 	cp ./node_modules/onsenui/css/onsen-css-components.css ./addon/lib
 	cp ./node_modules/onsenui/js/onsenui.js ./addon/lib
+	cp ./extension/manifest.json ./addon
 
 develop:
 	@echo "Start Development.."
