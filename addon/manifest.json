@@ -1,9 +1,8 @@
 {
-  "name": "Link hell",
-  "version": "1.0",
-  "description": "Page links",
-  "manifest_version": 2,
-  "chrome_url_overrides": {
-    "newtab": "index.html"
-  }
+                     "name": "Link hell",
+                  "version": "1.0",
+              "description": "Page links",
+         "manifest_version": 2,
+     "chrome_url_overrides": { "newtab": "index.html" },
+  "content_security_policy": "script-src 'self'; object-src 'self'"
 }

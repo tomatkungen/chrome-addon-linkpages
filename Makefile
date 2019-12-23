@@ -8,6 +8,7 @@ production:
 	@echo "Build Production"
 	mkdir -p addon
 	cp index.html ./addon
+	cp main.js ./addon
 	cp ./tsc-build/addon.js ./addon
 	mkdir -p addon/lib
 	cp lib/*.js ./addon/lib
