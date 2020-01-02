@@ -1,6 +1,47 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 define("structure", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("bookmarks", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class cBookmarks {
+        constructor() { }
+        onCreateBookmarkListener() {
+            if (!this.isBookmarkActive())
+                return;
+            let mm = () => __awaiter(this, void 0, void 0, function* () {
+                let book = yield this.getBookMarkTree();
+                console.log(book);
+            });
+            mm();
+            chrome.bookmarks.onCreated.addListener((id, bookmark) => {
+                console.log('Created bookmark');
+            });
+        }
+        getBookMarkTree() {
+            return __awaiter(this, void 0, void 0, function* () {
+                if (!this.isBookmarkActive())
+                    return;
+                return new Promise((resolve) => {
+                    chrome.bookmarks.getTree((bookmarkTreeNode) => resolve(bookmarkTreeNode));
+                });
+            });
+        }
+        isBookmarkActive() {
+            return (chrome && chrome.bookmarks);
+        }
+    }
+    exports.cBookmarks = cBookmarks;
 });
 define("utils", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -115,7 +156,7 @@ define("card", ["require", "exports", "utils", "datastorage"], function (require
     }
     exports.cCard = cCard;
 });
-define("cards", ["require", "exports", "card", "utils"], function (require, exports, card_1, utils_2) {
+define("cards", ["require", "exports", "card", "utils", "bookmarks"], function (require, exports, card_1, utils_2, bookmarks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class cCards {
@@ -125,7 +166,9 @@ define("cards", ["require", "exports", "card", "utils"], function (require, expo
             this.elmContainer = utils_2.Utils.getElmById(this.elmContainerId);
             this.cCards = [];
             this.settings = this.defaultSettings();
+            this.cBookmarks = new bookmarks_1.cBookmarks();
             Object.assign(this.settings, settings);
+            this.activateBookmarksListener();
         }
         defaultSettings() {
             return {
@@ -192,6 +235,9 @@ define("cards", ["require", "exports", "card", "utils"], function (require, expo
                         row;
                 column++;
             });
+        }
+        activateBookmarksListener() {
+            this.cBookmarks.onCreateBookmarkListener();
         }
     }
     exports.cCards = cCards;

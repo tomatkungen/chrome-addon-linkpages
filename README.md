@@ -1,6 +1,11 @@
 # Production
 
-## How to Install addon extension in Google Chrome browser
+### Addon Permission
+
+* Replace the page that you see when opening a new tab
+* Read and change your bookmarks
+
+### How to Install Addon-Extension in Google Chrome browser
 
 1. Open the Extension Management page by navigating to chrome://extensions.
     

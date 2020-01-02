@@ -1,6 +1,7 @@
 import { cCard } from "./card";
 import { iConfigurePageLink, iSettingCards } from "./structure";
 import { Utils } from "./utils";
+import { cBookmarks } from "./bookmarks";
 
 class cCards {
   // Element container
@@ -15,16 +16,21 @@ class cCards {
   // Settings for card style
   private settings: iSettingCards;
 
+  private cBookmarks: cBookmarks;
+
   constructor(
     private configurepageLinks: iConfigurePageLink[],
-    settings: {} = {}
+    settings: {} = {},
   ) {
     this.elmContainerId = "container";
     this.elmContainer = Utils.getElmById(this.elmContainerId);
     this.cCards = [];
     this.settings = this.defaultSettings();
+    this.cBookmarks = new cBookmarks();
 
     Object.assign(this.settings, settings);
+
+    this.activateBookmarksListener();
   }
 
   private defaultSettings(): iSettingCards {
@@ -126,6 +132,10 @@ class cCards {
 
       column++;
     });
+  }
+
+  private activateBookmarksListener() {
+    this.cBookmarks.onCreateBookmarkListener();
   }
 }
 

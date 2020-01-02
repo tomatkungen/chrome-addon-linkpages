@@ -1,0 +1,36 @@
+
+** Chrome addon linkpage - Objekt Orienterad Ascii Design ** 
+
+* Classes
+    - cCards
+    - cCard
+    - cDataStorage
+    - cBookmarks
+    - cPageLinkItems
+        - Convert from bookmarksItem -> pageLinkItem
+    - iBridgeInterface
+    - aPageLinkItem
+    - cBrigde
+        - iBrigdeInterface Methods
+            - pb_mRender()
+            - pb_mPopulate(iPageLinkItem)
+            - pb_mGUISettings   // DefaultSettings 
+
+
+
+
+                            | aPageLinkItem |
+    | iBridgeInterface |         ^
+        |                        |    
+    | cCards |<------------->| cCard  |
+        ^   
+        |
+        |
+        | | iBridgeInterface |       | iBrigdeInterface |   | aPageLinkItem |
+        |    ^                                 ^                       ^
+        |    |                                 |                       |
+    | cBridge |-------------------------->| cTrees |<------------->| cNode |
+        ^
+        |
+    | cMain |<----->| cPageLinkItems |<------| cBookmarks |
+
