@@ -1,22 +1,24 @@
-interface iBookmark {
-    dataAdded : number;   // 1577135260264
+/*interface iBookmark {
     id        : string;   // "137"
-    index     : number;   // 86
     parentId  : string;   // "1"
-    title     : string;   // "chrome.bookmarks - Google Chrome"
+    index     : number;   // 86
     url       : string;   // "https://developer.chrome.com/extensions/bookmarks#event-onCreated"
-  }
+    title     : string;   // "chrome.bookmarks - Google Chrome"
+    dataAdded : number;   // 1577135260264
+  }*/
   
-  interface iBookmarkMap {
-      dateAdded   : number;
-      id          : string;
-      index       : number;
-      parentId    : string;
-      title       : string;
-      children    : (iBookmark | iBookmarkMap)[];
-  }
+interface iBookmarkTreeNode {
+    id                : string;
+    parentId?         : string;
+    index?            : number;
+    url?              : string;
+    title             : string;
+    dateAdded?        : number;
+    dateGroupModified?: number;
+    children?         : (iBookmarkTreeNode)[];
+}
   
-  export {
-    iBookmark,
-    iBookmarkMap
-  };
+export {
+    /*iBookmark,*/
+    iBookmarkTreeNode
+};

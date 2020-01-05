@@ -31,8 +31,8 @@ abstract class aPageLinkItem {
         return ((this._pageLinkItem && this._pageLinkItem.subTitle) || "");
     }
 
-    public getGroupBy(): string {
-        return ((this._pageLinkItem && this._pageLinkItem.groupby) || "");
+    public getGroupBy(): number {
+        return ((this._pageLinkItem && this._pageLinkItem.groupBy) || 0);
     }
 
     public getId(): number {
@@ -41,8 +41,8 @@ abstract class aPageLinkItem {
 
     private addAnyAsDefaultGroup() {
         Utils.isObject(this._pageLinkItem) &&
-        !this._pageLinkItem.groupby &&
-        (this._pageLinkItem.groupby = "any");
+        !this._pageLinkItem.groupTitle &&
+        (this._pageLinkItem.groupTitle = "any");
     }
 
     private addPageItemToStorage() {

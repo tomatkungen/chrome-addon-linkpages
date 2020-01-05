@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,10 +7,78 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+/*interface iBookmark {
+    id        : string;   // "137"
+    parentId  : string;   // "1"
+    index     : number;   // 86
+    url       : string;   // "https://developer.chrome.com/extensions/bookmarks#event-onCreated"
+    title     : string;   // "chrome.bookmarks - Google Chrome"
+    dataAdded : number;   // 1577135260264
+  }*/
+define("interface/ibookmark", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("cbookmarks", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class cBookmarks {
+        constructor() { }
+        onCreateBookmarkListener() {
+            if (!this.isBookmarkActive())
+                return;
+            chrome.bookmarks.onCreated.addListener((id, bookmark) => {
+                console.log('Created bookmark');
+            });
+        }
+        getBookMarkTree() {
+            return __awaiter(this, void 0, void 0, function* () {
+                return new Promise((resolve, reject) => {
+                    if (!this.isBookmarkActive())
+                        return reject([]);
+                    chrome.bookmarks.getTree((bookmarkTreeNode) => resolve(bookmarkTreeNode));
+                });
+            });
+        }
+        isBookmarkActive() {
+            return (chrome && chrome.bookmarks);
+        }
+    }
+    exports.cBookmarks = cBookmarks;
+});
 define("interface/ipagelink", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     ;
+});
+define("interface/ibridge", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("cbridge", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    class cBridge {
+        constructor(brigde) {
+            this._currentBridge = brigde;
+        }
+        render() {
+            if (!this._currentBridge)
+                return false;
+            return this._currentBridge.render();
+        }
+        populate(iPageLinkItems) {
+            if (!this._currentBridge)
+                return;
+            this._currentBridge.populate(iPageLinkItems);
+        }
+        guiSettings(settings) {
+            if (!this._currentBridge)
+                return;
+            this._currentBridge.guiSettings(settings);
+        }
+    }
+    exports.cBridge = cBridge;
 });
 define("sutils", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -41,6 +108,20 @@ define("sutils", ["require", "exports"], function (require, exports) {
         }
         static compareObjects(firstObj, secondObj) {
             return JSON.stringify(firstObj) === JSON.stringify(secondObj);
+        }
+        static isNotNumber(anyValue) {
+            return window.isNaN(anyValue);
+        }
+        static approximateDomain(url = "http://localhost") {
+            const urlDomain = new URL(url);
+            return urlDomain.hostname.split('.').map((name, index, array) => {
+                if (name === 'www' ||
+                    (index > 0 &&
+                        index === (array.length - 1) &&
+                        Utils.isNotNumber(name)))
+                    return '';
+                return name;
+            }).join(' ').trim() + (urlDomain.port === '' ? '' : ' : ' + urlDomain.port);
         }
     }
     exports.Utils = Utils;
@@ -99,15 +180,15 @@ define("abstract/apagelinkitem", ["require", "exports", "sutils", "cdatastorage"
             return ((this._pageLinkItem && this._pageLinkItem.subTitle) || "");
         }
         getGroupBy() {
-            return ((this._pageLinkItem && this._pageLinkItem.groupby) || "");
+            return ((this._pageLinkItem && this._pageLinkItem.groupBy) || 0);
         }
         getId() {
             return this._pageLinkItem.id;
         }
         addAnyAsDefaultGroup() {
             sutils_1.Utils.isObject(this._pageLinkItem) &&
-                !this._pageLinkItem.groupby &&
-                (this._pageLinkItem.groupby = "any");
+                !this._pageLinkItem.groupTitle &&
+                (this._pageLinkItem.groupTitle = "any");
         }
         addPageItemToStorage() {
             if (cdatastorage_1.cDataStorage.hasLocalStorage()) {
@@ -117,7 +198,7 @@ define("abstract/apagelinkitem", ["require", "exports", "sutils", "cdatastorage"
     }
     exports.aPageLinkItem = aPageLinkItem;
 });
-define("card", ["require", "exports", "abstract/apagelinkitem"], function (require, exports, apagelinkitem_1) {
+define("ccard", ["require", "exports", "abstract/apagelinkitem"], function (require, exports, apagelinkitem_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class cCard extends apagelinkitem_1.aPageLinkItem {
@@ -132,7 +213,7 @@ define("card", ["require", "exports", "abstract/apagelinkitem"], function (requi
                         <h2>${super.getTitle()}</h2>
                     </div>
                     <div class="sub-title">
-                        <h5>${super.getSubTitle()}</h5>
+                        <span>${super.getSubTitle()}</p>
                     </div>
                 </ons-card>
             </a>
@@ -140,10 +221,6 @@ define("card", ["require", "exports", "abstract/apagelinkitem"], function (requi
         }
     }
     exports.cCard = cCard;
-});
-define("interface/ibridge", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
 });
 define("interface/isetting", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -201,7 +278,7 @@ define("abstract/alayout", ["require", "exports", "sutils"], function (require, 
     }
     exports.aLayout = aLayout;
 });
-define("cards", ["require", "exports", "card", "sutils", "abstract/alayout"], function (require, exports, card_1, sutils_3, alayout_1) {
+define("ccards", ["require", "exports", "ccard", "sutils", "abstract/alayout"], function (require, exports, ccard_1, sutils_3, alayout_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class cCards extends alayout_1.aLayout {
@@ -249,7 +326,7 @@ define("cards", ["require", "exports", "card", "sutils", "abstract/alayout"], fu
         }
         generateCards() {
             for (const pageLinkItem of super.pageLinkItems) {
-                this._cCards.push(new card_1.cCard(pageLinkItem));
+                this._cCards.push(new ccard_1.cCard(pageLinkItem));
             }
         }
         setCardsSize() {
@@ -287,143 +364,61 @@ define("cards", ["require", "exports", "card", "sutils", "abstract/alayout"], fu
     }
     exports.cCards = cCards;
 });
-define("interface/ibookmark", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("cbookmarks", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    class cBookmarks {
-        constructor() { }
-        onCreateBookmarkListener() {
-            if (!this.isBookmarkActive())
-                return;
-            chrome.bookmarks.onCreated.addListener((id, bookmark) => {
-                console.log('Created bookmark');
-            });
-        }
-        getBookMarkTree() {
-            return __awaiter(this, void 0, void 0, function* () {
-                return new Promise((resolve, reject) => {
-                    if (!this.isBookmarkActive())
-                        return reject();
-                    chrome.bookmarks.getTree((bookmarkTreeNode) => resolve(bookmarkTreeNode));
-                });
-            });
-        }
-        isBookmarkActive() {
-            return (chrome && chrome.bookmarks);
-        }
-    }
-    exports.cBookmarks = cBookmarks;
-});
-define("cbridge", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    class cBridge {
-        constructor(brigde) {
-            this._currentBridge = brigde;
-        }
-        render() {
-            if (!this._currentBridge)
-                return false;
-            return this._currentBridge.render();
-        }
-        populate(iPageLinkItems) {
-            if (!this._currentBridge)
-                return;
-            this._currentBridge.populate(iPageLinkItems);
-        }
-        guiSettings(settings) {
-            if (!this._currentBridge)
-                return;
-            this._currentBridge.guiSettings(settings);
-        }
-    }
-    exports.cBridge = cBridge;
-});
-define("cpageLinks", ["require", "exports"], function (require, exports) {
+define("cpageLinks", ["require", "exports", "cbookmarks", "sutils"], function (require, exports, cbookmarks_1, sutils_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class cPageLinks {
         constructor() {
+            this._cBookmarks = new cbookmarks_1.cBookmarks();
         }
         getPageLinkItems() {
-            return [
-                {
-                    id: 1,
-                    title: "Conflunce",
-                    subTitle: "Latest Wiki updates - Linköping",
-                    link: "http://www.google.se"
-                },
-                {
-                    id: 2,
-                    title: "Conflunce",
-                    subTitle: "Latest Wiki updates - Linköping",
-                    link: "http://www.google.se"
+            return __awaiter(this, void 0, void 0, function* () {
+                let pageLinkItems = [];
+                try {
+                    this.pageLinkItemsFlatten(yield this._cBookmarks.getBookMarkTree(), undefined, pageLinkItems);
                 }
-            ];
+                catch (e) {
+                    return [];
+                }
+                return pageLinkItems;
+            });
+        }
+        pageLinkItemsFlatten(bookmarkTreeNodes, bookmarkTreeChild = { id: "0", title: "any" }, pageLinkItems) {
+            for (const bookmarkTreeNode of bookmarkTreeNodes) {
+                if (bookmarkTreeNode.children) {
+                    this.pageLinkItemsFlatten(bookmarkTreeNode.children, bookmarkTreeNode, pageLinkItems);
+                }
+                else {
+                    pageLinkItems.push({
+                        id: parseInt(bookmarkTreeNode.id, 10),
+                        title: sutils_4.Utils.approximateDomain(bookmarkTreeNode.url),
+                        subTitle: (bookmarkTreeNode.title || 'No Description'),
+                        link: (bookmarkTreeNode.url || ''),
+                        groupBy: parseInt(bookmarkTreeChild.id, 10),
+                        groupTitle: (bookmarkTreeChild.title || '')
+                    });
+                }
+            }
         }
     }
     exports.cPageLinks = cPageLinks;
 });
-define("cmain", ["require", "exports", "cbridge", "cards", "cpageLinks"], function (require, exports, cbridge_1, cards_1, cpageLinks_1) {
+define("cmain", ["require", "exports", "cbridge", "ccards", "cpageLinks"], function (require, exports, cbridge_1, ccards_1, cpageLinks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class cMain {
         constructor() {
-            this._aryGuiComponents = [new cards_1.cCards()];
+            this._aryGuiComponents = [new ccards_1.cCards()];
             this._cBrigde = new cbridge_1.cBridge(this._aryGuiComponents[this._aryGuiComponents.length - 1]);
             this._cPageLinks = new cpageLinks_1.cPageLinks();
         }
         main() {
-            this._cBrigde.populate(this._cPageLinks.getPageLinkItems());
-            this._cBrigde.guiSettings(null);
-            this._cBrigde.render();
+            (() => __awaiter(this, void 0, void 0, function* () {
+                this._cBrigde.populate(yield this._cPageLinks.getPageLinkItems());
+                this._cBrigde.guiSettings(null);
+                this._cBrigde.render();
+            }))();
         }
     }
     new cMain().main();
 });
-// Card item configure
-/*interface iConfigurePageLink {
-  id        : number;
-  title     : string;
-  link      : string;
-  subTitle? : string;
-  groupby?  : string;
-}*/
-// Card Settings
-/*interface iSettingCards {
-  defaultCardHeight       : number;
-  defaultCardWidth        : number;
- // defaultWinHeight        : number;
- // defaultwinWidth         : number;
-  defaultCardSpaceWidth   : number;
-  defaultCardSpaceHeight  : number;
-}*/
-// Bookmark
-/*interface iBookmarkSite {
-  dataAdded : number;   // 1577135260264
-  id        : string;   // "137"
-  index     : number;   // 86
-  parentId  : string;   // "1"
-  title     : string;   // "chrome.bookmarks - Google Chrome"
-  url       : string;   // "https://developer.chrome.com/extensions/bookmarks#event-onCreated"
-}
-
-interface iBookmarkMap {
-    dateAdded   : number;
-    id          : string;
-    index       : number;
-    parentId    : string;
-    title       : string;
-    children    : (iBookmarkSite | iBookmarkMap)[];
-}
-
-export {
-  //iConfigurePageLink,
-  //iSettingCards,
-  iBookmarkSite,
-  iBookmarkMap
-};*/

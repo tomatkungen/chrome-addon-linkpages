@@ -21,6 +21,13 @@
       .sub-title {
         text-align: center;
         color: gray;
+        height: 60px;
+        overflow: hidden;
+        font-weight: 500;
+      }
+      .content {
+        overflow-y: auto;
+        overflow-x: hidden;
       }
     </style>
   </head>
@@ -29,7 +36,7 @@
       <ons-toolbar>
         <div class="center" style="color:goldenrod;">Links</div>
       </ons-toolbar>
-      <div id="container"></div>
+      <div id="container" class="content"></div>
     </ons-page>
   </body>
 </html>

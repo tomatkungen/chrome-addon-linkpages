@@ -15,7 +15,7 @@ class cCard extends aPageLinkItem {
                         <h2>${super.getTitle()}</h2>
                     </div>
                     <div class="sub-title">
-                        <h5>${super.getSubTitle()}</h5>
+                        <span>${super.getSubTitle()}</p>
                     </div>
                 </ons-card>
             </a>

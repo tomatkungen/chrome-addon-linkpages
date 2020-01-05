@@ -1,12 +1,12 @@
 import { cBridge } from "./cbridge";
 import { iBridge } from "./interface/ibridge";
-import { cCards } from "./cards";
+import { cCards } from "./ccards";
 import { cPageLinks } from "./cpageLinks";
 
 
 class cMain {
     private _aryGuiComponents: Array<iBridge>;
-    
+
     private _cBrigde: cBridge;
     private _cPageLinks: cPageLinks;
 
@@ -17,9 +17,11 @@ class cMain {
     }
 
     public main(): void {
-        this._cBrigde.populate(this._cPageLinks.getPageLinkItems());
-        this._cBrigde.guiSettings(null);
-        this._cBrigde.render();
+        (async () => {
+            this._cBrigde.populate(await this._cPageLinks.getPageLinkItems());
+            this._cBrigde.guiSettings(null);
+            this._cBrigde.render();
+        })();
     }
 }
 

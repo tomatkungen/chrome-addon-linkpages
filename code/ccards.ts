@@ -1,4 +1,4 @@
-import { cCard } from "./card";
+import { cCard } from "./ccard";
 import { Utils } from "./sutils";
 import { iBridge } from "./interface/ibridge";
 import { iPageLinkItems } from "./interface/ipagelink";

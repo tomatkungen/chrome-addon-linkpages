@@ -1,4 +1,4 @@
-import { iBookmark, iBookmarkMap } from "./interface/ibookmark";
+import { iBookmarkTreeNode } from "./interface/ibookmark";
 
 declare let chrome: any;
 
@@ -8,16 +8,16 @@ class cBookmarks {
     public  onCreateBookmarkListener() {
         if (!this.isBookmarkActive()) return;
 
-        chrome.bookmarks.onCreated.addListener((id: string, bookmark: iBookmark) => {
+        chrome.bookmarks.onCreated.addListener((id: string, bookmark: iBookmarkTreeNode) => {
             console.log('Created bookmark');
         
         });
     }
 
-    public async getBookMarkTree(): Promise<iBookmarkMap> {
+    public async getBookMarkTree(): Promise<iBookmarkTreeNode[]> {
 
         return new Promise((resolve, reject) => {
-            if (!this.isBookmarkActive()) return reject();
+            if (!this.isBookmarkActive()) return reject([]);
 
             chrome.bookmarks.getTree(
                 (bookmarkTreeNode: any) => resolve(bookmarkTreeNode)

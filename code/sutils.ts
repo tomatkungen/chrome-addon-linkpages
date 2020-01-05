@@ -33,6 +33,29 @@ class Utils {
     public static compareObjects<T extends object, U extends Object>(firstObj: T, secondObj: U): boolean {
         return JSON.stringify(firstObj) === JSON.stringify(secondObj);
     }
+
+    public static isNotNumber(anyValue: any): boolean {
+        return window.isNaN(anyValue);
+    }
+
+    public static approximateDomain(url: string = "http://localhost"): string {
+        const urlDomain = new URL(url);
+
+        return urlDomain.hostname.split('.').map((name: string, index, array) => {
+            if (
+                name === 'www' ||
+                (
+                    index > 0 &&
+                    index === (array.length - 1) &&
+                    Utils.isNotNumber(name)
+                )
+            ) return '';
+
+            return name;
+        }).join(' ').trim() + (urlDomain.port === '' ? '' : ' : ' + urlDomain.port);
+
+
+    }
 }
 
 export { Utils };
