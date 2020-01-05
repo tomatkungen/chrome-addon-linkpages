@@ -1,4 +1,4 @@
-import { iBookmarkSite, iBookmarkMap } from "./structure";
+import { iBookmark, iBookmarkMap } from "./interface/ibookmark";
 
 declare let chrome: any;
 
@@ -8,7 +8,7 @@ class cBookmarks {
     public  onCreateBookmarkListener() {
         if (!this.isBookmarkActive()) return;
 
-        chrome.bookmarks.onCreated.addListener((id: string, bookmark: iBookmarkSite) => {
+        chrome.bookmarks.onCreated.addListener((id: string, bookmark: iBookmark) => {
             console.log('Created bookmark');
         
         });

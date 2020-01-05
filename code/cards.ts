@@ -1,159 +1,131 @@
 import { cCard } from "./card";
-import { iConfigurePageLink, iSettingCards } from "./structure";
-import { Utils } from "./utils";
-import { cBookmarks } from "./bookmarks";
+import { Utils } from "./sutils";
+import { iBridge } from "./interface/ibridge";
+import { iPageLinkItems } from "./interface/ipagelink";
+import { aLayout } from "./abstract/alayout";
+import { iSettingCard } from "./interface/isetting";
 
-class cCards {
-  // Element container
-  private elmContainer: HTMLElement | null;
+class cCards extends aLayout implements iBridge {
 
-  // Element continar id
-  private elmContainerId: string;
+    // Array of cards
+    private _cCards: cCard[];
 
-  // Array of cards
-  private cCards: cCard[];
+    // Settings for card style
+    private _settingCard: iSettingCard;
 
-  // Settings for card style
-  private settings: iSettingCards;
+    constructor() {
+        super();
 
-  private cBookmarks: cBookmarks;
+        this._cCards      = [];
+        this._settingCard = {
+          cardHeight      : 170,  // Card Height
+          cardWidth       : 250,  // Card Width
+          cardSpaceWidth  : 5,    // Card width space
+          cardSpaceHeight : 5     // Card height space
+        };
+    }
 
-  constructor(
-    private configurepageLinks: iConfigurePageLink[],
-    settings: {} = {},
-  ) {
-    this.elmContainerId = "container";
-    this.elmContainer = Utils.getElmById(this.elmContainerId);
-    this.cCards = [];
-    this.settings = this.defaultSettings();
-    this.cBookmarks = new cBookmarks();
+    public guiSettings<T>(settings: T & iSettingCard | null) {
+        if (
+            !settings ||
+            !Utils.compareObjects(settings, this._settingCard)
+        ) return;
 
-    Object.assign(this.settings, settings);
+        this._settingCard = {
+            cardHeight      : settings.cardHeight,          // Card Height
+            cardWidth       : settings.cardWidth,           // Card Width
+            cardSpaceWidth  : settings.cardSpaceWidth,      // Card width space
+            cardSpaceHeight : settings.cardSpaceHeight      // Card height space
+        };
 
-    this.activateBookmarksListener();
-  }
+        this.render();
+    }
 
-  private defaultSettings(): iSettingCards {
-    return {
-      defaultCardHeight: 170, // Card Height
-      defaultCardWidth: 250, // Card Width
-      defaultWinHeight: window.innerHeight, // Window Height
-      defaultwinWidth: window.innerWidth, // Window Width
-      defaultCardSpaceWidth: 5, // Card width space
-      defaultCardSpaceHeight: 5 // Card height space
-    };
-  }
+    public populate(iPageLinkItems: iPageLinkItems) {
+        super.pageLinkItems = iPageLinkItems;
+    }
 
-  public render(): boolean {
-    if (
-      this.configurepageLinks &&
-      this.configurepageLinks &&
-      !this.configurepageLinks.length
-    )
-      return false;
+    public render(): boolean {
+        if (!super.hasPageLinkItems()) return false;
 
-    this.generateCards();
-    this.setCardsSize();
-    this.setCardsPosition();
+        // Generate Cards
+        this._cCards = [];
+        this.generateCards();
 
-    return true;
-  }
+        if (!super.container) return false;
 
-  private generateCards() {
-    if (!this.elmContainer) return;
+        // Render Cards
+        super.container.innerHTML = this._cCards.map((cCard: cCard) => {
+            return cCard.template();
+        }).join('');
 
-    this.cCards = [];
+        // Adjust Cards
+        this.setCardsSize();
+        this.setCardsPosition();
 
-    const htmlCards: string[] = [];
-    this.configurepageLinks.forEach((configurePageLink: iConfigurePageLink) => {
-      htmlCards.push(
-        cCard.cardTemplate(
-          configurePageLink.id,
-          configurePageLink.title,
-          configurePageLink.link,
-          configurePageLink.subTitle
-        )
-      );
+        return true;
+    }
 
-      this.cCards.push(new cCard(configurePageLink));
-    });
+    private generateCards() {
 
-    this.elmContainer.innerHTML = htmlCards.join();
-  }
+        for (const pageLinkItem of super.pageLinkItems) {
+            this._cCards.push(new cCard(pageLinkItem));
+        }
 
-  private setCardsSize() {
-    const onsCards: HTMLCollectionOf<Element> = Utils.getElmsByTagName(
-      "ons-card"
-    );
+    }
 
-    if (!onsCards || !onsCards.length) return;
+    private setCardsSize() {
+        const onsCards: HTMLCollectionOf<Element> = Utils.getElmsByTagName(
+            "ons-card"
+        );
 
-    Utils.loopOjbWithCallback(onsCards, onsCard => {
-      const s = onsCard.style;
-      s.width = Utils.convertIntToStylePixel(this.settings.defaultCardWidth);
-      s.height = Utils.convertIntToStylePixel(this.settings.defaultCardHeight);
-    });
-  }
+        if (!onsCards || !onsCards.length) return;
 
-  private setCardsPosition(): void {
-    const onsCards: HTMLCollectionOf<Element> = Utils.getElmsByTagName(
-      "ons-card"
-    );
+        Utils.loopOjbWithCallback(onsCards, onsCard => {
+            const s = onsCard.style;
+            s.width = Utils.convertIntToStylePixel(this._settingCard.cardWidth);
+            s.height = Utils.convertIntToStylePixel(this._settingCard.cardHeight);
+        });
+    }
 
-    if (!onsCards || !onsCards.length) return;
+    private setCardsPosition(): void {
+        const onsCards: HTMLCollectionOf<Element> = Utils.getElmsByTagName(
+            "ons-card"
+        );
 
-    const totalCardsPerRow = Math.floor(
-      this.settings.defaultwinWidth /
-        (this.settings.defaultCardSpaceWidth * 2 +
-          this.settings.defaultCardWidth)
-    );
+        if (!onsCards || !onsCards.length) return;
 
-    let column = 0,
-      row = 0;
+        const totalCardsPerRow = Math.floor(
+            super.settings.winWidth /
+            (
+                this._settingCard.cardSpaceWidth * 2 +
+                this._settingCard.cardWidth
+            )
+        );
 
-    Utils.loopOjbWithCallback(onsCards, (onsCard, key, index) => {
-      const s = onsCard.style;
+        let column = 0, row = 0;
 
-      if (column >= totalCardsPerRow) {
-        column = 0;
-        row++;
-      }
+        Utils.loopOjbWithCallback(onsCards, (onsCard, key, index) => {
+            const s = onsCard.style;
 
-      s.position = "absolute";
-      s.left = Utils.convertIntToStylePixel(
-        (this.settings.defaultCardSpaceWidth * 2 +
-          this.settings.defaultCardWidth) *
-          column
-      );
-      s.top =
-        (this.settings.defaultCardSpaceHeight * 2 +
-          this.settings.defaultCardHeight) *
-        row;
+            if (column >= totalCardsPerRow) {
+                column = 0;
+                row++;
+            }
 
-      column++;
-    });
-  }
+            s.position = "absolute";
+            s.left = Utils.convertIntToStylePixel((
+                    this._settingCard.cardSpaceWidth * 2 +
+                    this._settingCard.cardWidth
+            ) * column);
+            s.top = (
+                this._settingCard.cardSpaceHeight * 2 +
+                this._settingCard.cardHeight
+            ) * row;
 
-  private activateBookmarksListener() {
-    this.cBookmarks.onCreateBookmarkListener();
-  }
+            column++;
+        });
+    }
 }
 
-const conf = [
-  {
-    id: 1,
-    title: "Conflunce",
-    subTitle: "Latest Wiki updates - Linköping",
-    link: "http://www.google.se"
-  },
-  {
-    id: 2,
-    title: "Conflunce",
-    subTitle: "Latest Wiki updates - Linköping",
-    link: "http://www.google.se"
-  }
-];
-
 export { cCards };
-
-new cCards(conf).render();

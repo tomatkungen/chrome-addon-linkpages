@@ -3,4 +3,4 @@ window.AppView = () => {};
 window.ExtensionOptions = () => {};
 window.WebView = () => {};
 
-require(["cards"], function() {});
+require(["cmain"], function() {});

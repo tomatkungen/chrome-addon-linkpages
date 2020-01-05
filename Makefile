@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := develop
 
-INSTALL_DIR := /usr/local/Cellar/node/12.10.0/lib/node_modules/typescript/bin/
+INSTALL_DIR := /usr/local/lib/node_modules/typescript/bin/
 TSC := $(INSTALL_DIR)tsc
 
 
