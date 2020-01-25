@@ -6,7 +6,7 @@
     title     : string;   // "chrome.bookmarks - Google Chrome"
     dataAdded : number;   // 1577135260264
   }*/
-  
+
 interface iBookmarkTreeNode {
     id                : string;
     parentId?         : string;
@@ -17,8 +17,16 @@ interface iBookmarkTreeNode {
     dateGroupModified?: number;
     children?         : (iBookmarkTreeNode)[];
 }
-  
+
+interface iBookmarkListener {
+    (
+        id: string,
+        items: iBookmarkTreeNode[]
+    ): void;
+}
+
 export {
     /*iBookmark,*/
-    iBookmarkTreeNode
+    iBookmarkTreeNode,
+    iBookmarkListener
 };

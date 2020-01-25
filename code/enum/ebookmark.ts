@@ -1,0 +1,9 @@
+enum eBOOKMARK_TYPE {
+    ONCREATED   = "ONCREATED",
+    ONREMOVED   = "ONREMOVED",
+    ONCHANGED   = "ONCHANGED",
+    ONMOVED     = "ONMOVED",
+    ONALL       = "ONALL"
+}
+
+export { eBOOKMARK_TYPE };

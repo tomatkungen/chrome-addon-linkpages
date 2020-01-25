@@ -19,17 +19,28 @@ define("interface/ibookmark", ["require", "exports"], function (require, exports
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("cbookmarks", ["require", "exports"], function (require, exports) {
+define("enum/ebookmark", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var eBOOKMARK_TYPE;
+    (function (eBOOKMARK_TYPE) {
+        eBOOKMARK_TYPE["ONCREATED"] = "ONCREATED";
+        eBOOKMARK_TYPE["ONREMOVED"] = "ONREMOVED";
+        eBOOKMARK_TYPE["ONCHANGED"] = "ONCHANGED";
+        eBOOKMARK_TYPE["ONMOVED"] = "ONMOVED";
+        eBOOKMARK_TYPE["ONALL"] = "ONALL";
+    })(eBOOKMARK_TYPE || (eBOOKMARK_TYPE = {}));
+    exports.eBOOKMARK_TYPE = eBOOKMARK_TYPE;
+});
+define("cbookmarks", ["require", "exports", "enum/ebookmark"], function (require, exports, ebookmark_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     class cBookmarks {
-        constructor() { }
-        onCreateBookmarkListener() {
-            if (!this.isBookmarkActive())
-                return;
-            chrome.bookmarks.onCreated.addListener((id, bookmark) => {
-                console.log('Created bookmark');
-            });
+        constructor() {
+            // Activate Listeners
+            this.activateListeners();
+            // Listeners
+            this._bookmarkListeners = [];
         }
         getBookMarkTree() {
             return __awaiter(this, void 0, void 0, function* () {
@@ -40,11 +51,73 @@ define("cbookmarks", ["require", "exports"], function (require, exports) {
                 });
             });
         }
+        getBookMarkTreeById(id) {
+            return __awaiter(this, void 0, void 0, function* () {
+                return new Promise((resolve, reject) => {
+                    resolve();
+                });
+            });
+        }
+        addEventListener(type, listenerFn) {
+            this._bookmarkListeners.push({
+                type: type,
+                listenerFn: listenerFn
+            });
+        }
+        activateListeners() {
+            if (!this.isBookmarkActive())
+                return;
+            this.onCreateBookmarkListener();
+            this.onRemoveBookmarkListener();
+            this.onChangeBookmarkListener();
+            this.onMovedBookmarkListener();
+        }
+        triggerBookmarkListener(type, id) {
+            for (const bookmarkListener of this._bookmarkListeners) {
+                if (bookmarkListener.type === type ||
+                    bookmarkListener.type === cBookmarks.eBOOKMARK_TYPE.ONALL) {
+                    (() => __awaiter(this, void 0, void 0, function* () {
+                        bookmarkListener.listenerFn(id, yield this.getBookMarkTree());
+                    }))();
+                }
+            }
+        }
+        onCreateBookmarkListener() {
+            if (!this.isBookmarkActive())
+                return;
+            chrome.bookmarks.onCreated.addListener((id) => {
+                console.log('Created bookmark');
+                this.triggerBookmarkListener(cBookmarks.eBOOKMARK_TYPE.ONCREATED, id);
+            });
+        }
+        onRemoveBookmarkListener() {
+            if (!this.isBookmarkActive())
+                return;
+            chrome.bookmarks.onRemoved.addListener((id) => {
+                this.triggerBookmarkListener(cBookmarks.eBOOKMARK_TYPE.ONREMOVED, id);
+            });
+        }
+        onChangeBookmarkListener() {
+            if (!this.isBookmarkActive())
+                return;
+            chrome.bookmarks.onChanged.addListener((id) => {
+                this.triggerBookmarkListener(cBookmarks.eBOOKMARK_TYPE.ONCHANGED, id);
+            });
+        }
+        onMovedBookmarkListener() {
+            if (!this.isBookmarkActive())
+                return;
+            chrome.bookmarks.onMoved.addListener((id) => {
+                this.triggerBookmarkListener(cBookmarks.eBOOKMARK_TYPE.ONMOVED, id);
+            });
+        }
         isBookmarkActive() {
             return (chrome && chrome.bookmarks);
         }
     }
     exports.cBookmarks = cBookmarks;
+    // Enum listener types
+    cBookmarks.eBOOKMARK_TYPE = ebookmark_1.eBOOKMARK_TYPE;
 });
 define("interface/ipagelink", ["require", "exports"], function (require, exports) {
     "use strict";

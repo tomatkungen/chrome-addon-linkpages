@@ -31,6 +31,11 @@
     - aPageLinkItem
 ```
 
+##### Enum
+```
+    - eBookMarkType
+```
+
 ##### OOA - Design
 ```
     | aLayout |
